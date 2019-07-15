@@ -41,10 +41,9 @@ boot pom; boot jar; boot install
 
 ## Usage
 
-In your project.clj file, add dependencies:
+In your project.clj file, add dependency:
 
 ```clojure
-[random-seed "1.0.0"]
 [mrgbstats "0.1.0"]
 ```
 
