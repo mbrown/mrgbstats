@@ -9,7 +9,12 @@ Original author: Matthew Robert Graham Brown
 
 ## Version
 
-Current version is 0.1.0
+Current version: 0.1.0
+
+
+## Dependencies
+
+random-seed version 1.0.0
 
 
 ## Installation
@@ -36,9 +41,10 @@ boot pom; boot jar; boot install
 
 ## Usage
 
-In your project.clj file, add dependency:
+In your project.clj file, add dependencies:
 
 ```clojure
+[random-seed "1.0.0"]
 [mrgbstats "0.1.0"]
 ```
 
