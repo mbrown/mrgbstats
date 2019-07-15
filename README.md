@@ -12,9 +12,37 @@ Original author: Matthew Robert Graham Brown
 Current version is 0.1.0
 
 
+## Installation
+
+Clone mrgbstats from the Github repository:
+
+```
+git clone https://github.com/mbrown/mrgbstats
+```
+
+Install mrgbstats locally in your Maven .m2 folder, using leiningen:
+
+```
+cd mrgbstats
+lein pom; lein jar; lein install
+```
+
+or using boot:
+
+```
+cd mrgbstats
+boot pom; boot jar; boot install
+```
+
 ## Usage
 
-Clone code from the Github repository.
+In your project.clj file, add dependency:
+
+```clojure
+[mrgbstats "0.1.0"]
+```
+
+Clojure code:
 
 ```clojure
 (require '[mrgbstats.core :as mrgbstats])
