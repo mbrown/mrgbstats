@@ -1,8 +1,8 @@
 # mrgbstats
 
-A Clojure library for basic statistal analysis using permutation testing and
+A Clojure library for basic statistical analysis using permutation testing and
 Benjamini-Hochberg false discovery rate (FDR) correction for multiple
-comparisons.
+comparisons
 
 Original author: Matthew Robert Graham Brown
 
