@@ -4,7 +4,8 @@ A Clojure library for basic statistical analysis using permutation testing and
 Benjamini-Hochberg false discovery rate (FDR) correction for multiple
 comparisons
 
-Original author: Matthew Robert Graham Brown
+Creator: Matthew Robert Graham Brown
+Created: July 11, 2019
 
 
 ## Version
@@ -38,6 +39,7 @@ or using boot:
 cd mrgbstats
 boot pom; boot jar; boot install
 ```
+
 
 ## Usage
 
