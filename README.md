@@ -31,14 +31,14 @@ Install mrgbstats locally in your Maven .m2 folder, using leiningen:
 
 ```
 cd mrgbstats
-lein pom; lein jar; lein install
+lein do clean, pom, jar, install
 ```
 
 or using boot:
 
 ```
 cd mrgbstats
-boot pom; boot jar; boot install
+boot clean; boot pom; boot jar; boot install
 ```
 
 

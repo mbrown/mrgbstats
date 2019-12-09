@@ -1,0 +1,19 @@
+
+TODO:
+
+
+----------
+Uncommitted changes:
+
+- Renamed permtest-xxx functions to permtest-singlevar-xxx.
+- Changed permtest-singlevar-xxx functions to accept a single variable function instead of always using mean().
+- Created mrgbstats/permtest.
+- Moved single variable permutation backend functions from mrgbstats/core to mfgbstats/permtest.
+- mrgbstats.core/fdr fn now sets random seed.
+- Added various basic stats functions to mrgbstats.core.
+- In mrgbstats.permtest, added functions for comparing multiple proportions of values (i.e. categories) between two groups using chi-squared.
+- Added mrgbstats.atoms namespace.
+
+
+----------
+Committed changes:

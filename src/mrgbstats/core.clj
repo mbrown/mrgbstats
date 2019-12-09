@@ -1,88 +1,92 @@
 (ns mrgbstats.core
-  (:require [random-seed.core :as random-seed]))
+  (:require [mrgbstats.permtest :as permtest]
+            [mrgbstats.atoms :as atoms]
+            [random-seed.core :as random-seed]))
 
+; ----------
+; Basic statistics functions
 (defn mean
   "a = seq or vec of numbers"
   [a]
   (/ (double (reduce + a)) (count a)))
 
-(defn- permtest-sim-diff
-  "Simulates one iteration for permutation testing.
-  Used by permtest-absdiffs fn."
+(defn variance
+  "a = seq or vec of numbers"
+  [a]
+  (let [m (mean a)]
+    (/ (double (reduce (fn [acc x] (+ acc (* (- x m) (- x m)))) 0.0 a))
+       (dec (count a)))))
+
+(defn std
+  "a = seq or vec of numbers"
+  [a]
+  (java.lang.Math/sqrt (variance a)))
+
+(defn pooled-variance
+  "a, b = seq or vec of numbers"
   [a b]
-  (let [[sima simb]
-        (split-at (count a) (shuffle (concat a b)))]
-    (- (mean sima) (mean simb))))
+  (/ (+ (* (variance a) (dec (count a)))
+        (* (variance b) (dec (count b))))
+     (+ (count a) (count b) -2)))
 
-(defn- permtest-absdiffs
-  "Used by permtest-serial and permtest-parallel fns.
-  Returns vec of absolute diffs |simulated group a - b|"
-  [a b numiter]
-  (random-seed/set-random-seed!
-    (+ (.getId (Thread/currentThread))
-       (Math/abs (.hashCode (java.time.Instant/now)))))
-  (loop
-    [diffvec (transient (vec (repeat numiter 0.0)))
-     i (dec numiter)]
-    (if (< i 0)
-      (let [p (persistent! diffvec)]
-        ;(println p)
-        p)
-      (recur
-        (assoc! diffvec i (Math/abs (permtest-sim-diff a b)))
-        (dec i)))))
+(defn pooled-std
+  "a, b = seq or vec of numbers"
+  [a b]
+  (java.lang.Math/sqrt (pooled-variance a b)))
 
-(defn- permtest-serial
-  "Permutation testing. Tests for difference of means of two groups.
-  Uses single thread. 
-  a and b = seqs or vecs.
-  numiter = number of iterations
-  Returns two-tailed p-value."
-  [a b numiter]
-  (let [actual-abs-diff
-        (Math/abs (- (mean a) (mean b)))
-        abs-diffs
-        (conj (permtest-absdiffs a b (dec numiter)) actual-abs-diff)]
-    (/ (double (count (filter #(>= %1 actual-abs-diff) abs-diffs)))
-       numiter)))
+(defn stderr
+  "a = seq or vec of numbers"
+  [a]
+  (/ (std a)
+     (java.lang.Math/sqrt (count a))))
 
-(defn- permtest-parallel
-  "Permutation testing. Tests for difference of means of two groups.
-  Uses four threads.
-  a and b = seqs or vecs.
-  numiter = number of iterations, should be divisible by 4 (will work if not,
-  but some results might be slightly off expected)
-  Returns two-tailed p-value."
-  [a b numiter]
-  (let [actual-abs-diff
-        (Math/abs (- (mean a) (mean b)))
-        numiter-by-4 (/ numiter 4)
-        abs-diffs
-        (concat
-          (deref (future (permtest-absdiffs a b numiter-by-4)))
-          (deref (future (permtest-absdiffs a b numiter-by-4)))
-          (deref (future (permtest-absdiffs a b numiter-by-4)))
-          (deref (future (permtest-absdiffs a b (dec numiter-by-4))))
-          [actual-abs-diff])]
-    (/ (double (count (filter #(>= %1 actual-abs-diff) abs-diffs)))
-       numiter) ))
+(defn median
+  "a = seq or vec of numbers"
+  [a]
+  (nth (sort a) (java.lang.Math/round (/ (count a) 2.0))))
 
-(defn permtest
-  "Permutation testing. Tests for difference of means of two groups.
+
+; ----------
+; Permutation testing API
+(defn permtest-singlevar
+  "Permutation testing. Tests for difference of single variable function of
+  two groups. Single variable function could be mean, variance, or any other
+  function taking n-samples of a single variable as input.
   a and b = seqs or vecs of numbers to compare
+  func = single variable function (eg: mean, variance, etc.)
   numiter = number of iterations
-  parallel = Boolean (default false). If true, runs permutations on four parallel threads.
-             If running in parallel mode, numiter should be a multiple of 4.
+  parallel? = Boolean (default false). If true, runs permutations on four parallel threads.
+  If running in parallel mode, numiter should be a multiple of 4.
   Returns two-tailed p-value."
-  ([a b numiter]
-   (permtest a b numiter false))
-  ([a b numiter parallel]
-   (if parallel
-     (permtest-parallel a b numiter)   
-     (permtest-serial a b numiter))))
+  ([a b func numiter]
+   (permtest-singlevar a b func numiter false))
+  ([a b func numiter parallel?]
+   (if parallel?
+     (permtest/permtest-singlevar-parallel a b func numiter)   
+     (permtest/permtest-singlevar-serial a b func numiter))))
 
+(defn permtest-multiprops
+  "Permutation testing for multiple categorical variables based on chi
+  squared. Tests for difference of distributions between two groups.
+  a and b = seqs or vecs.
+  numiter = number
+  Returns p-value."
+  ([a b numiter]
+   (permtest-multiprops a b numiter false))
+  ([a b numiter parallel?]
+   (when
+     (and parallel?
+          (not @atoms/warning-given-no-parallel-permtest-multiprops-atom))
+     (reset! atoms/warning-given-no-parallel-permtest-multiprops-atom true)
+     (println
+       "WARNING: parallel computation not implemented for permtest-multiprops fn,"
+       "defaulting to single thread computation."))
+   (permtest/permtest-multiprops-serial a b numiter)))
+
+; ----------
+; FDR multiple comparison correction API
 (defn fdr
-  "pvec = vec of p-values
+  "pvec = vector of p-values
   alpha = corrected p-value (default 0.05)
   Performs false discovery rate (FDR) correction for multiple comparisons
   using the Benjamini-Hochberg method.
@@ -91,6 +95,9 @@
   ([pvec]
    (fdr pvec 0.05))
   ([pvec alpha]
+   (random-seed/set-random-seed!
+     (+ (.getId (Thread/currentThread))
+        (Math/abs (.hashCode (java.time.Instant/now)))))
    (let [sorted-hi-low (reverse (sort pvec))
          m (double (count pvec))]
      (loop
