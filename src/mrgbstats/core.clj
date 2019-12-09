@@ -50,7 +50,7 @@
   "Permutation testing. Tests for difference of means of two groups.
   Uses four threads.
   a and b = seqs or vecs.
-  numiter = number of iterations, should be divisble by 4 (will work if not,
+  numiter = number of iterations, should be divisible by 4 (will work if not,
   but some results might be slightly off expected)
   Returns two-tailed p-value."
   [a b numiter]

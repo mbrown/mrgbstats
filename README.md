@@ -10,11 +10,12 @@ Created: July 11, 2019
 
 ## Version
 
-Current version: 0.1.0
+Current version: 0.1.1-SNAPSHOT
 
 
 ## Dependencies
 
+clojure version 1.10.1
 random-seed version 1.0.0
 
 
@@ -46,7 +47,7 @@ boot pom; boot jar; boot install
 In your project.clj file, add dependency:
 
 ```clojure
-[mrgbstats "0.1.0"]
+[mrgbstats "0.1.0-SNAPSHOT"]
 ```
 
 Clojure code:
