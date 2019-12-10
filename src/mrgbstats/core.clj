@@ -1,6 +1,7 @@
 (ns mrgbstats.core
   (:require [mrgbstats.permtest :as permtest]
             [mrgbstats.atoms :as atoms]
+            [mrgbstats.glm :as glm]
             [random-seed.core :as random-seed]))
 
 ; ----------
@@ -49,39 +50,68 @@
 ; ----------
 ; Permutation testing API
 (defn permtest-singlevar
-  "Permutation testing. Tests for difference of single variable function of
-  two groups. Single variable function could be mean, variance, or any other
+  "Permutation testing. Tests for difference of single variable functions of
+  two groups. Single variable functions could be mean, variance, or any other
   function taking n-samples of a single variable as input.
   a and b = seqs or vecs of numbers to compare
-  func = single variable function (eg: mean, variance, etc.)
+  func-a and func-b = single variable functions (eg: mean, variance, etc.)
+  applied to inputs a and b, respectively.
   numiter = number of iterations
-  parallel? = Boolean (default false). If true, runs permutations on four parallel threads.
-  If running in parallel mode, numiter should be a multiple of 4.
+  options = hash-map, possible keys :parallel?
+    parallel? = Boolean (default false). If true, runs permutations on four
+    parallel threads. If running in parallel mode, numiter should be a multiple
+    of 4.
   Returns two-tailed p-value."
-  ([a b func numiter]
-   (permtest-singlevar a b func numiter false))
-  ([a b func numiter parallel?]
-   (if parallel?
-     (permtest/permtest-singlevar-parallel a b func numiter)   
-     (permtest/permtest-singlevar-serial a b func numiter))))
+  ([a b func-a func-b numiter]
+   (permtest-singlevar a b func-a func-b numiter nil))
+  ([a b func-a func-b numiter options]
+   (permtest/permtest-singlevar a b func-a func-b numiter options)))
+
+(defn permtest-mean
+  "Permutation testing. Tests for difference of means two groups.
+  a and b = seqs or vecs of numbers to compare
+  numiter = number of iterations
+  options = hash-map, possible keys :parallel?
+    parallel? = Boolean (default false). If true, runs permutations on four
+    parallel threads. If running in parallel mode, numiter should be a multiple
+    of 4.
+  Returns two-tailed p-value."
+  ([a b numiter]
+   (permtest-mean a b numiter nil))
+  ([a b numiter options]
+   (permtest/permtest-singlevar a b mean mean numiter options)))
 
 (defn permtest-multiprops
   "Permutation testing for multiple categorical variables based on chi
   squared. Tests for difference of distributions between two groups.
   a and b = seqs or vecs.
   numiter = number
+  options = hash-map, possible keys :parallel?
+    parallel? = Boolean (default false). If true, runs permutations on four
+    parallel threads. If running in parallel mode, numiter should be a multiple
+    of 4.
   Returns p-value."
   ([a b numiter]
-   (permtest-multiprops a b numiter false))
-  ([a b numiter parallel?]
-   (when
-     (and parallel?
-          (not @atoms/warning-given-no-parallel-permtest-multiprops-atom))
-     (reset! atoms/warning-given-no-parallel-permtest-multiprops-atom true)
-     (println
-       "WARNING: parallel computation not implemented for permtest-multiprops fn,"
-       "defaulting to single thread computation."))
-   (permtest/permtest-multiprops-serial a b numiter)))
+   (permtest-multiprops a b numiter nil))
+  ([a b numiter options]
+   (permtest/permtest-multiprops a b numiter options)))
+
+(defn permtest-linear-slope
+  "Permutation testing. Tests for difference of linear slope of two groups.
+  linear model: y = slope * x + intercept. Mean-centres x.
+  x = vector of independent variables
+  y = seq or vec of dependent variables
+  numiter = number of iterations
+  options = hash-map, possible keys :parallel?
+    parallel? = Boolean (default false). If true, runs permutations on four
+    parallel threads. If running in parallel mode, numiter should be a multiple
+    of 4.
+  Returns two-tailed p-value."
+  ([x y numiter]
+   (permtest-linear-slope x y numiter nil))
+  ([x y numiter options]
+   (permtest/permtest-oneglmparam
+     y (glm/make-linear-slope-computer x) numiter options)))
 
 ; ----------
 ; FDR multiple comparison correction API

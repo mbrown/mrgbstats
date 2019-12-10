@@ -4,8 +4,11 @@ All notable changes to this project will be documented in this file. This change
 ## [Unreleased] - 2019-12-09
 
 ### Changes
-- In mrgbstats.core, permtest fn renamed to permtest-singlevar and now takes a
-  single variable function (eg: mean, variance, etc.).
+- In mrgbstats.core, permtest fn renamed to permtest-singlevar and now takes
+  single variable functions func-a and func-b (eg: mean, variance, etc.) that
+  compute scores to compare from groups a and b, respectively. Can pass the
+  same function for both func-a and func-b if desired.
+- In mrgbstats.core, added permtest-mean fn for comparing means of two groups.
 - In mrgbstats.core, added permtest-multiprops fn for comparing multiple
   proportions of values from two groups.
 
