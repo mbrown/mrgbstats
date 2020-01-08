@@ -97,7 +97,7 @@
    (permtest/permtest-multiprops a b numiter options)))
 
 (defn permtest-linear-slope
-  "Permutation testing. Tests for difference of linear slope of two groups.
+  "Permutation testing. Compares linear slope from a single group to zero.
   linear model: y = slope * x + intercept. Mean-centres x.
   x = vector of independent variables
   y = seq or vec of dependent variables

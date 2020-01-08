@@ -1,5 +1,6 @@
 (ns mrgbstats.core-test
   (:require [clojure.test :refer :all]
+            [mrgbstats.glm :as glm]  
             [mrgbstats.core :refer :all]))
 
 (def printret-on false)
@@ -57,7 +58,7 @@
   (testing
     "Testing permtest-mean, groups identical, should have p=0.1."
     (is (= (printret
-             "permtest-mean, grups same, p ="
+             "permtest-mean, groups identical, p ="
              (permtest-mean
                [0 1 2 3 4 5]
                [0 1 2 3 4 5]
@@ -105,4 +106,43 @@
                [1 2 2 3 2 2 3 3 2 3 3 4]
                200 nil))
            0.05))))
+
+(deftest test-make-linear-slope-computer-slope0
+  (testing
+    "test-make-linear-slope-computer-slope0, should have slope=0.0"
+    (is (= 0.0
+           (printret
+             "make-linear-slope-computer, slope 0, computed slope ="
+             (let
+               [x [10 11 12 13 14 15 16 17 18 19]
+                y [10 10 10 10 10 10 10 10 10 10]
+                slope-fn (glm/make-linear-slope-computer x)
+                slope (slope-fn y)]
+               slope))))))
+
+(deftest test-make-linear-slope-computer-slope2
+  (testing
+    "test-make-linear-slope-computer-slope2, should have slope=2.0"
+    (is (= 2.0
+           (printret
+             "make-linear-slope-computer, slope 2, computed slope ="
+             (let
+               [x [10 11 12 13 14 15 16 17 18 19]
+                y [20 22 24 26 28 30 32 34 36 38]
+                slope-fn (glm/make-linear-slope-computer x)
+                slope (slope-fn y)]
+               slope))))))
+
+(deftest test-make-linear-slope-computer-slope-minus2
+  (testing
+    "test-make-linear-slope-computer-slope-minus2, should have slope=-2.0"
+    (is (= -2.0
+           (printret
+             "make-linear-slope-computer, slope -2, computed slope ="
+             (let
+               [x [210 211 212 213 214 215 216 217 218 219]
+                y [-20 -22 -24 -26 -28 -30 -32 -34 -36 -38]
+                slope-fn (glm/make-linear-slope-computer x)
+                slope (slope-fn y)]
+               slope))))))
 

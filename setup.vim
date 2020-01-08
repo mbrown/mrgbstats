@@ -3,4 +3,5 @@
 :e CHANGELOG.md
 :e project.clj
 :args ./src/**/*.clj
-:b 1
+:args ./test/**/*.clj
+:b todo.txt

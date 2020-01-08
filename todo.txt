@@ -4,14 +4,8 @@ TODO:
 ----------
 Uncommitted changes:
 
-- All permtest-singlevar-xxx functions now take two function arguments, func-a and func-b, instead of one.
-- Refactored permtest functions in mrgbstats.core and mrgbstats.permtest. parallel? argument rolled into options hash-map in mrgbstats.permtest functions.
-- Added permtest-multiprops-parallel fn mrgbstats.permtest.
-- Added permtest-linear-slope fn to mrgbstats.core.
-- Added permtest-oneglmparam-xxx fns to mrgbstats.permtest.
-- Added mrgbstats.glm for GLM modelling.
-- Added tests in test/mrgbstats/core_test.clj.
-- Added setup.vim.
+- In glm/make-linear-slope-computer, if dot product zero, slope always Double/NaN.
+- Updated tests.
 
 
 ----------
@@ -25,4 +19,14 @@ Committed changes:
 - Added various basic stats functions to mrgbstats.core.
 - In mrgbstats.permtest, added functions for comparing multiple proportions of values (i.e. categories) between two groups using chi-squared.
 - Added mrgbstats.atoms namespace.
+
+- All permtest-singlevar-xxx functions now take two function arguments, func-a and func-b, instead of one.
+- Refactored permtest functions in mrgbstats.core and mrgbstats.permtest. parallel? argument rolled into options hash-map in mrgbstats.permtest functions.
+- Added permtest-multiprops-parallel fn mrgbstats.permtest.
+- Added permtest-linear-slope fn to mrgbstats.core.
+- Added permtest-oneglmparam-xxx fns to mrgbstats.permtest.
+- Added mrgbstats.glm for GLM modelling.
+- Added tests in test/mrgbstats/core_test.clj.
+- Added setup.vim.
+
 
