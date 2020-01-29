@@ -4,8 +4,6 @@ TODO:
 ----------
 Uncommitted changes:
 
-- In glm/make-linear-slope-computer, if dot product zero, slope always Double/NaN.
-- Updated tests.
 
 
 ----------
@@ -29,4 +27,7 @@ Committed changes:
 - Added tests in test/mrgbstats/core_test.clj.
 - Added setup.vim.
 
+- In glm/make-linear-slope-computer, if dot product zero, slope always Double/NaN.
+- Updated tests.
 
+- Added Cohen's d and Cohen's h effect size functions.

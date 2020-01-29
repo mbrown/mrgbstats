@@ -46,6 +46,35 @@
   [a]
   (nth (sort a) (java.lang.Math/round (/ (count a) 2.0))))
 
+; ----------
+; Effect sizes
+(defn cohen-d
+  "a, b = seq or vec of numbers.
+  Returns signed Cohen's d effect size."
+  [a b]
+  (let [ps (pooled-std a b)]
+    (if (zero? ps)
+      Double/NaN
+      (/ (double (- (mean a) (mean b))) ps))))
+
+(defn prop-binary
+  "a = seq or vec of binary numbers with values 0 and 1.
+  Returns proportion of 1's in a."
+  [a]
+  (/ (double (reduce + a)) (count a)))
+
+(defn arcsin-prop
+  "p = proportion.
+  Returns arcsine transformation of p."
+  [p]
+  (* 2 (Math/asin (Math/sqrt p))))
+
+(defn cohen-h
+  "a, b = seq or vec of binary numbers with values 0 and 1.
+  Returns signed Cohen's h effect size on the proportions of 1s."
+  [a b]
+  (- (arcsin-prop (prop-binary a))
+     (arcsin-prop (prop-binary b))))
 
 ; ----------
 ; Permutation testing API

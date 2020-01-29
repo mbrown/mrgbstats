@@ -40,7 +40,7 @@
 (defn permtest-singlevar-serial
   "Permutation testing. Tests for difference of single variable function of
   two groups. Single variable function could be mean, variance, or any other
-  function taking n-samples of a single variable as input.
+  function taking samples of a single variable as input.
   Uses single thread. 
   a and b = seqs or vecs
   func-a and func-b = single variable functions (eg: mean, variance, etc.)
@@ -60,7 +60,7 @@
 (defn permtest-singlevar-parallel
   "Permutation testing. Tests for difference of single variable function of
   two groups. Single variable function could be mean, variance, or any other
-  function taking n-samples of a single variable as input.
+  function taking samples of a single variable as input.
   Uses four threads.
   a and b = seqs or vecs
   func-a and func-b = single variable functions (eg: mean, variance, etc.)
@@ -95,7 +95,7 @@
 (defn permtest-singlevar
   "Permutation testing. Tests for difference of single variable functions of
   two groups. Single variable functions could be mean, variance, or any other
-  function taking n-samples of a single variable as input.
+  function taking samples of a single variable as input.
   a and b = seqs or vecs of numbers to compare
   func-a and func-b = single variable functions (eg: mean, variance, etc.)
   applied to inputs a and b, respectively.
@@ -114,6 +114,24 @@
 ; Permutation testing to compare two groups in terms of multiple proportions
 ; (categories)
 
+(defn sq
+  [x]
+  (* x x))
+
+(defn chisq
+  "Chi squared computation for one sample of categorical variables.
+  refprops = hash-map mapping values to proportions, must contain all values
+  present in a, sum of proportions must be 1.0."
+  [a refprops]
+  (let
+    [valset (set a)
+     q (for [v valset]
+         (let [expected-a (double (* (count a) (get refprops v)))
+               num-a (count (filter #(= % v) a))
+               sq-a (/ (sq (- num-a expected-a)) expected-a)]
+           sq-a))]
+    (reduce + q)))
+
 (defn compute-refprops
   "Computes reference proportions of all values under null hypothesis
   that a, b are from same distribution."
@@ -123,9 +141,6 @@
         valset (set c)]
     (into {} (for [v valset]
                [v (/ (double (count (filter #(= % v) c))) n)]))))
-(defn sq
-  [x]
-  (* x x))
 
 (defn chisq-multi
   "Chi squared computation for two samples of categorical variables.
